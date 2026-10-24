@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>מכונת סימון וחיתוך צינורות 100 ממ – סימולציה</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1b1e23">
+<link rel="stylesheet" href="style.css">
+<script async src="./vendor/es-module-shims.js"></script>
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/jsm/"}}</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="estopOv"></div>
+<div id="hud">
+  <div class="st" id="hState"><i></i><span id="hStateT">מוכן</span></div>
+  <div>חתיכות<b id="hPcs">0</b></div>
+  <div>שארית בצינור<b id="hRem">–</b></div>
+  <div>אורך אחרון<b id="hLast">–</b></div>
+  <div>פסולים<b id="hRej">0</b></div>
+  <div class="hm">זמן מחזור<b id="hCyc">–</b></div>
+  <div class="hm">חתיכות/שעה<b id="hPph">–</b></div>
+  <div class="bar"><span id="hBar"></span></div>
+</div>
+<button id="mbtn">☰ שליטה והסברים</button>
+<div id="panel">
+  <button id="pclose">✕</button>
+  <div id="phead">
+    <h1>מכונה אוטומטית: עיגול · סימון סרגל · חיתוך 100 ממ</h1>
+    <div class="sub">סימולציית קונספט · דיוק יעד ±2 ממ (יעד פנימי ±0.3) · גרור לסיבוב, צבוט/גלגלת לזום</div>
+    <div id="tabs">
+      <button data-t="ctl" class="on">שליטה</button>
+      <button data-t="st">תחנות</button>
+      <button data-t="risk">סיכונים</button>
+      <button data-t="data">נתונים</button>
+      <button data-t="bom">רכיבים</button>
+    </div>
+  </div>
+  <div id="pbody">
+  <!-- CONTROL -->
+  <div class="tab on" id="t-ctl">
+    <div class="btns">
+      <button class="primary" id="bStart">▶ הפעל</button>
+      <button id="bPause">⏸ השהה</button>
+      <button class="stop" id="bStop">⛔ עצירת חירום</button>
+    </div>
+    <div class="btns"><button id="bLoad">⟳ טען צינור חדש</button><button id="bReset">איפוס נתונים</button></div>
+    <h2>מתכון (Recipe)</h2>
+    <select id="preset"></select>
+    <div class="btns"><button id="bSave">💾 שמור מתכון</button></div>
+    <h2>פרמטרים</h2>
+    <div class="row"><label><span>מהירות הזנת צינור</span><span class="val" id="vSpd"></span></label><input type="range" id="sSpd" min="20" max="400" step="10" value="150"></div>
+    <div class="row"><label><span>רדיוס עיגול קצה</span><span class="val" id="vRad"></span></label><input type="range" id="sRad" min="0.2" max="3" step="0.1" value="1"></div>
+    <div class="row"><label><span>מרווח סימון</span><span class="val" id="vInt"></span></label>
+      <div class="seg" id="segInt"><button data-v="1" class="on">כל 1 ממ</button><button data-v="5">כל 5 ממ</button><button data-v="10">כל 10 ממ</button></div></div>
+    <label class="chk"><input type="checkbox" id="cNum" checked> חריטת מספרים כל 10 ממ (10,20…)</label>
+    <div class="row"><label><span>אורך צינור נטען</span><span class="val" id="vLen"></span></label><input type="range" id="sLen" min="400" max="1200" step="10" value="600"></div>
+    <div class="row"><label><span>קוטר חיצוני</span><span class="val" id="vDia"></span></label><input type="range" id="sDia" min="12" max="40" step="1" value="20"></div>
+    <div class="row"><label><span>חומר</span></label><select id="sMat"></select></div>
+    <div class="row"><label><span>שיטת חיתוך</span></label><select id="sCut">
+      <option value="orb">חותך אורביטלי (גלגלת) – ללא נסורת, kerf≈0</option>
+      <option value="saw">מסור דיסק קרביד – kerf 1.6 ממ</option></select></div>
+    <div class="row"><label><span>מהירות סימולציה</span><span class="val" id="vSim"></span></label><input type="range" id="sSim" min="0.25" max="4" step="0.25" value="1"></div>
+    <div class="note" id="techNote"></div>
+    <h2>תצוגה</h2>
+    <div class="btns"><button id="bX">🩻 X-RAY</button><button id="bLbl" class="on">🏷 תוויות</button><button id="bHome">🎥 מבט כללי</button></div>
+    <div class="row"><label><span>פירוק מכלולים (Explode)</span><span class="val" id="vExp">0%</span></label><input type="range" id="sExp" min="0" max="1" step="0.01" value="0"></div>
+    <div class="btns"><button id="bExp">💥 פרק / הרכב</button><button id="bFollow">🎯 עקוב אחרי החיתוך</button></div>
+  </div>
+  <!-- STATIONS -->
+  <div class="tab" id="t-st">
+    <div class="btns"><button class="primary" id="bTour">▶ סיור מודרך בכל התחנות</button></div>
+    <div id="stList"></div>
+  </div>
+  <!-- RISKS -->
+  <div class="tab" id="t-risk">
+    <div class="note" style="margin-top:4px">כל סיכון מזוהה ↔ פתרון מובנה בתכנון. לחיצה על כרטיס מראה את הרכיב הרלוונטי. אפשר גם <b>להפעיל תקלה</b> ולראות איך המכונה מתמודדת:</div>
+    <h2>הדמיית תקלות</h2>
+    <label class="chk"><input type="checkbox" id="fSlip"> החלקת צינור בהזנה</label>
+    <label class="chk"><input type="checkbox" id="fHeat"> התחממות / בלאי (סחיפת אורך)</label>
+    <label class="chk"><input type="checkbox" id="fHand"> יד של מפעיל נכנסת לווילון האור</label>
+    <label class="chk"><input type="checkbox" id="fLoop" checked> <b>בקרה סגורה פעילה</b> (גלגל מדידה + מד אורך + תיקון אוטומטי)</label>
+    <h2>מפת סיכונים</h2>
+    <div id="riskList"></div>
+  </div>
+  <!-- DATA -->
+  <div class="tab" id="t-data">
+    <h2>היסטוגרמת אורכים (98–102 ממ)</h2>
+    <canvas id="hist" width="640" height="240"></canvas>
+    <table id="stats"></table>
+    <h2>מחשבון שארית ותכנון חומר</h2>
+    <table id="calc"></table>
+    <div class="note" id="calcNote"></div>
+    <h2>10 חתיכות אחרונות</h2>
+    <div id="lastList"></div>
+    <div class="btns"><button id="bCsv">⬇ ייצוא CSV</button></div>
+  </div>
+  <!-- BOM -->
+  <div class="tab" id="t-bom">
+    <div class="note" style="margin-top:4px">רכיבים מוצעים (דוגמאות לדגמים נפוצים בתעשייה – לבחירה סופית מול ספקים). לחיצה על שורה מדגישה את הרכיב.</div>
+    <table class="bom" id="bomT"></table>
+  </div>
+  </div>
+</div>
+<div id="info"><h3><span id="iTitle"></span><button id="iClose">✕</button></h3><div id="iBody"></div><div class="nav"><button id="iPrev">‹ הקודם</button><button id="iNext">הבא ›</button></div></div>
+<div id="toast"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
