@@ -415,16 +415,15 @@ for (const x of [-1250, -900, -560]) {
 const gFeed = part('feeder', tr('מזין סרוו + מצמד פנימי'), tr('מוט דוחף עם קולט מתרחב בתוך הצינור – אפס החלקה'), [0, 0, -260], [-700, 140, -130]);
 const RAIL_Z = -150;
 box(1500, 40, 60, M.alu, -700, Y0 - 40, RAIL_Z, gFeed);
-for (let x = -1430; x <= 30; x += 100) box(6, 8, 62, M.frameDk, x, Y0 - 18, RAIL_Z, gFeed);
-cyl(8, 1440, M.steel, 'x', -700, Y0 + 2, RAIL_Z, gFeed); // ball screw
-for (const x of [-1450, 50]) box(30, 70, 60, M.frameDk, x, Y0 - 5, RAIL_Z, gFeed);
+const fScrew = cyl(8, 1440, M.steel, 'x', -700, Y0 + 15, RAIL_Z, gFeed); // ball screw
+const fBear = [-1450, 50].map(x => box(30, 70, 60, M.frameDk, x, Y0 + 15, RAIL_Z, gFeed)); fScrew.userData.with = fBear;
 const motor = new THREE.Group(); motor.position.set(-1530, Y0, RAIL_Z); gFeed.add(motor);
 box(120, 80, 80, M.black, 0, 0, 0, motor); cyl(34, 30, M.blue, 'x', -72, 0, 0, motor); box(6, 82, 82, M.alu, 62, 0, 0, motor);
 const carriage = new THREE.Group(); gFeed.add(carriage);
 box(80, 40, 80, M.alu, 0, Y0 + 15, RAIL_Z, carriage);
-box(40, 24, 141, M.orange, -10, Y0 + 34, -82.5, carriage); const tab = box(20, 26, 24, M.orange, -20, Y0 + 22, -4, carriage); tab.userData.allow = ['infeed', 'clampA', 'wheel'];
+const fArm = box(40, 24, 141, M.orange, -10, Y0 + 36, -82.5, carriage); const tab = box(20, 26, 24, M.orange, -20, Y0 + 22, -4, carriage); tab.userData.allow = ['infeed', 'clampA', 'wheel']; tab.userData.with = [fArm];
 const pusher = cyl(14, 60, M.steel, 'x', -30, Y0, 0, carriage); pusher.userData.allow = ['infeed', 'clampA']; // pusher head body
-const colletTip = cyl(5, 22, M.brass, 'x', 8, Y0, 0, carriage); colletTip.userData.allow = ['infeed', 'clampA'];
+const colletTip = cyl(5, 22, M.brass, 'x', 8, Y0, 0, carriage); colletTip.userData.allow = ['infeed', 'clampA']; colletTip.userData.with = [pusher];
 
 // ---- measuring wheel ----
 const gWheel = part('wheel', tr('גלגל מדידה + מקודד (על החומר)'), tr('מקודד שני על הצינור עצמו – מזהה החלקה'), [0, 220, 0], [-70, 100, 0]);
@@ -447,7 +446,7 @@ function makeClamp(id, name, x, w) {
   }
   return { g, jaws };
 }
-const clampA = makeClamp('clampA', tr('מלחציים A (לפני החיתוך)'), -24, 30);
+const clampA = makeClamp('clampA', tr('מלחציים A (לפני החיתוך)'), -40, 30);
 const clampB = makeClamp('clampB', tr('מלחציים B (על החתיכה)'), 55, 40);
 parts.clampA.dir.set(0, 0, 0); parts.clampB.dir.set(0, 0, 0);
 clampA.jaws.forEach(j => j.userData.ex = 1); clampB.jaws.forEach(j => j.userData.ex = 1);
@@ -459,7 +458,7 @@ const supBox = box(40, 1, 16, M.frameDk, 0, .5, 0, supV); supBox.geometry = new 
 // ---- chamfer / rounding head ----
 const gCh = part('chamfer', tr('ראש עיגול קצה (Form tool מסתובב)'), tr('ראש סיבובי שעוטף את קצה הצינור ומעגל ברדיוס R'), [300, 0, 0], [270, 120, 0]);
 const chSlide = new THREE.Group(); gCh.add(chSlide);
-box(320, 30, 120, M.alu, 330, TT + 15, 0, gCh);
+box(358, 30, 120, M.alu, 349, TT + 15, 0, gCh);
 box(160, 110, 110, M.frame, 300, Y0, 0, chSlide);
 box(80, 80, 80, M.black, 420, Y0, 0, chSlide);
 const chSpin = new THREE.Group(); chSpin.position.set(205, Y0, 0); chSlide.add(chSpin);
@@ -486,7 +485,7 @@ const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending:
 const sparkGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffa040, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); sparkGlow.scale.set(60, 60, 1); sparkGlow.visible = false; scene.add(sparkGlow);
 const gEncl = part('encl', tr('מארז לייזר Class-1 עם חלון סינון'), tr('חלון פוליקרבונט OD6+ @1064nm, דלת עם Interlock'), [0, 300, 300], [130, 330, 120], { shell: true });
 // enclosure: x 20..240, z -215..130, sits on the table T-slot rail (y = TT+40)
-const EN = { x0: 20, x1: 240, z0: -215, z1: 130, y0: TT + 40, y1: Y0 + 290 };
+const EN = { x0: 20, x1: 240, z0: -215, z1: 130, y0: TT + 41, y1: Y0 + 290 };
 { const { x0, x1, z0, z1, y0, y1 } = EN, P = 20, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = x1 - x0, d = z1 - z0, h = y1 - y0;
   for (const [ww, hh, dd, xx, yy, zz] of [[w - P, h - P, 3, cx, (y0 + y1) / 2 - P / 2, z1], [w - P, h - P, 3, cx, (y0 + y1) / 2 - P / 2, z0], [w - P, 3, d - P, cx, y1, cz]]) {
     const m = add(new THREE.Mesh(new THREE.BoxGeometry(ww, hh, dd), M.glass.clone()), gEncl); m.position.set(xx, yy, zz); m.castShadow = false; m.userData.glass = 1; }
@@ -502,10 +501,10 @@ const EN = { x0: 20, x1: 240, z0: -215, z1: 130, y0: TT + 40, y1: Y0 + 290 };
 const gSaw = part('saw', tr('יחידת חיתוך'), tr('חותך אורביטלי / מסור – נע מטה בציר סרוו'), [-250, 350, 0], [-29, 280, -60]);
 const sawArm = new THREE.Group(); gSaw.add(sawArm);
 const SX = -29; // ram/column x (blade sits at x=0, ram on the -x side)
-box(60, 420, 60, M.frameDk, SX, TT + 40 + 210, -235, gSaw); box(70, 10, 90, M.frameDk, SX - 5, TT + 45, -235, gSaw);
+box(60, 520, 60, M.frameDk, SX, TT + 40 + 260, -235, gSaw); box(60, 10, 108, M.frameDk, SX, TT + 45, -235, gSaw);
 const sawHead = new THREE.Group(); sawArm.add(sawHead);
 box(38, 230, 60, M.orange, SX, 115, 0, sawHead); // belt housing / ram
-box(40, 40, 240, M.orange, SX, 210, -120, sawHead); // carriage arm to column
+box(40, 40, 165, M.orange, SX, 210, -82.5, sawHead); const sawCar = [box(60, 70, 40, M.orange, SX, 210, -185, sawHead), box(60, 70, 30, M.orange, SX, 210, -280, sawHead), box(8, 70, 125, M.orange, SX - 34, 210, -232.5, sawHead), box(8, 70, 125, M.orange, SX + 34, 210, -232.5, sawHead)]; // carriage arm + slide block on guide rods
 const blade = new THREE.Group(); sawHead.add(blade);
 const bladeDisk = cyl(70, 2, M.steel, 'x', 0, 0, 0, blade, 72);
 for (let i = 0; i < 36; i++) { const a = i * TAU / 36; const t = box(3, 6, 4, M.carbide, 0, Math.cos(a) * 71, Math.sin(a) * 71, blade); t.rotation.x = -a; }
@@ -620,14 +619,14 @@ const DET = {};
   plate(70, 62, (c, w, h) => { c.fillStyle = '#f2c11d'; c.beginPath(); c.moveTo(w / 2, 4); c.lineTo(w - 4, h - 4); c.lineTo(4, h - 4); c.closePath(); c.fill(); c.lineWidth = 6; c.strokeStyle = '#111'; c.stroke(); c.fillStyle = '#111'; c.font = `bold ${h * .55}px Arial`; c.textAlign = 'center'; c.fillText('⚡', w / 2, h * .85); }, -760, 600, -441.5, gCab, Math.PI, 5);
 }
 { // ----- feeder: linear guide, servo, coupling, drag chain -----
-  linRail(1440, -700, Y0 - 12, RAIL_Z, gFeed); linBlock(0, Y0 - 4 - 8, RAIL_Z, carriage); carriage.children.forEach(o => { if (o.position.x === 0 && o.position.y === Y0 - 12) o.position.y = Y0 - 12; });
-  motor.visible = false; servo(gFeed, -1555, Y0 + 2, RAIL_Z, 'x', 130, 86); cyl(14, 30, M.alu, 'x', -1475, Y0 + 2, RAIL_Z, gFeed, 24);
+  linRail(1440, -700, Y0 - 12, RAIL_Z, gFeed); linBlock(0, Y0 - 7, RAIL_Z, carriage); carriage.userData.with = [gFeed.children.find(o => o.isMesh && o.position.x === -700 && o.position.y === Y0 - 12), fScrew]; carriage.children.forEach(o => { if (o.position.x === 0 && o.position.y === Y0 - 12) o.position.y = Y0 - 12; });
+  motor.visible = false; servo(gFeed, -1555, Y0 + 15, RAIL_Z, 'x', 130, 86); cyl(14, 30, M.alu, 'x', -1475, Y0 + 15, RAIL_Z, gFeed, 24);
   bolts(gFeed, [[-1450, Y0 + 30, RAIL_Z - 20], [-1450, Y0 + 30, RAIL_Z + 20], [50, Y0 + 30, RAIL_Z - 20], [50, Y0 + 30, RAIL_Z + 20]]);
   // drag chain (instanced links), updated per frame
   const N = 58, pitch = 30; const link = new THREE.InstancedMesh(new RoundedBoxGeometry(pitch - 2, 22, 44, 1, 3), phys({ color: 0x1a1c20, metalness: 0, roughness: .55, clearcoat: .3 }), N); link.castShadow = true; gFeed.add(link);
   const pin = new THREE.InstancedMesh(new THREE.CylinderGeometry(3, 3, 46, 8), M.steel.clone(), N); gFeed.add(pin);
   DET.chain = { link, pin, N, pitch, R: 48, xf: -1450, y0: Y0 - 52, z: RAIL_Z - 75 };
-  box(60, 20, 50, M.alu, -1450, Y0 - 52, RAIL_Z - 75, gFeed); box(20, 120, 50, M.alu, -20, Y0 - 30, RAIL_Z - 75 + 0, carriage); carriage.children.at(-1).position.set(-20, Y0 - 10, RAIL_Z - 75);
+  box(60, 20, 50, M.alu, -1450, Y0 - 52, RAIL_Z - 75, gFeed); box(20, 120, 50, M.alu, -20, Y0 - 30, RAIL_Z - 75 + 0, carriage); carriage.children.at(-1).position.set(-20, Y0 - 10, RAIL_Z - 75); carriage.children.at(-1).scale.y = 100 / 120;
   box(1380, 6, 60, M.alu, -760, Y0 - 66, RAIL_Z - 75, gFeed);
 }
 { // ----- infeed details -----
@@ -635,25 +634,28 @@ const DET = {};
 }
 { // ----- clamps: pneumatic cylinders, valve island, FRL, hoses -----
   for (const c of [clampA, clampB]) c.jaws.forEach(j => { j.children.filter(o => o.geometry && o.geometry.type !== 'RoundedBoxGeometry' && o.position.z !== 0).forEach(o => o.visible = false); });
-  for (const c of [clampA, clampB]) c.jaws.forEach(j => { const s = j.userData.s, x = j.children[0].position.x; cyl(5, 50, M.steel, 'z', x, Y0, s * 40, j, 16); bolts(j, [[x - 10, Y0 + 22, -s * 6], [x + 10, Y0 + 22, -s * 6]], .6); });
-  for (const c of [clampA, clampB]) { const x = c.jaws[0].children[0].position.x; for (const s of [-1, 1]) { pneu(c.g, x, Y0, s * 85, 44, 13); box(36, 22, 12, M.frameDk, x, TT + 70 + 11, s * 101, c.g); } }
+  for (const c of [clampA, clampB]) c.jaws.forEach(j => { const s = j.userData.s, x = j.children[0].position.x; j.userData.rod = cyl(5, 50, M.steel, 'z', x, Y0, s * 40, j, 16); bolts(j, [[x - 10, Y0 + 22, -s * 6], [x + 10, Y0 + 22, -s * 6]], .6); });
+  for (const c of [clampA, clampB]) { const x = c.jaws[0].children[0].position.x; for (const s of [-1, 1]) { const pg = pneu(c.g, x, Y0, s * 85, 44, 13); c.jaws.find(j => j.userData.s === s).userData.rod.userData.with = pg.children.slice(); box(36, 22, 12, M.frameDk, x, TT + 70 + 11, s * 101, c.g); } }
   const v = new THREE.Group(); gFrame.add(v); v.position.set(-260, TT, 150);
   box(150, 30, 60, M.alu, 0, 15, 0, v); for (let i = 0; i < 4; i++) { box(26, 50, 40, M.black, -52 + i * 34, 55, 0, v); box(8, 6, 3, phys({ color: 0x30ff70, emissive: 0x30ff70, emissiveIntensity: 1.5 }), -52 + i * 34, 72, 21, v); }
   const frl = new THREE.Group(); gFrame.add(frl); frl.position.set(-420, TT, 170); box(50, 60, 50, M.alu, 0, 110, 0, frl); cyl(20, 70, M.glassClear, 'y', 0, 45, 0, frl, 24); cyl(18, 8, M.black, 'y', 0, 150, 0, frl, 24); cyl(16, 6, M.white, 'z', 0, 110, 28, frl, 24);
   plate(26, 26, (c, w, h) => { c.fillStyle = '#fff'; c.beginPath(); c.arc(w / 2, h / 2, w / 2 - 2, 0, TAU); c.fill(); c.strokeStyle = '#222'; c.lineWidth = 3; c.stroke(); c.save(); c.translate(w / 2, h / 2); for (let i = 0; i <= 10; i++) { c.rotate(i ? .45 : -2.3); c.fillRect(-1, -w / 2 + 4, 2, 6); } c.restore(); c.strokeStyle = '#c00'; c.lineWidth = 3; c.beginPath(); c.moveTo(w / 2, h / 2); c.lineTo(w * .78, h * .3); c.stroke(); }, 0, 110, 31.5, frl, 0, 8);
   const H = (pts) => tube(pts, 3.2, M.hose, gFrame, 48);
   H([[-420, TT + 140, 195], [-380, TT + 160, 220], [-310, TT + 80, 190], [-300, TT + 20, 150]]);
-  for (const [cx, k] of [[-24, 0], [55, 1]]) for (const s of [-1, 1]) { const px = -310 + (k * 2 + (s + 1) / 2) * 34 + 8, zz = s * (122 + k * 6), ex = cx + 9, ez = s * 107;
-    const pts = [[px, TT + 82, 175], [px, TT + 50, 160], [-90 - k * 8, TT + 5, 122 + k * 6]]; if (s < 0) pts.push([-90 - k * 8, TT + 5, 60], [-90 - k * 8, TT + 5, zz]); else pts.push([-75, TT + 5, zz]);
-    pts.push([ex, TT + 5, zz], [ex, TT + 30, s * 100], [ex, Y0 + 30, ez]); H(pts).userData.allow = ['clampA', 'clampB']; }
+  for (const [cx, k] of [[-40, 0], [55, 1]]) for (const s of [-1, 1]) { const px = -310 + (k * 2 + (s + 1) / 2) * 34 + 8, zz = s * (122 + k * 6), ex = cx + 9, ez = s * 107;
+    const zr = (k ? 118.5 : 132) + (s < 0 ? 7 : 0), xr = s > 0 ? ex : ex - 12;
+    const pts = [[px, TT + 82, 175], [px, TT + 50, 160], [-120 - k * 8 - (s < 0 ? 6 : 0), TT + 5, zr], [-90 - k * 8 - (s < 0 ? 6 : 0), TT + 5, zr], [xr - 20, TT + 5, zr], [xr, TT + 5, zr], [xr, TT + 25, 120], [xr, TT + 60, 120]];
+    if (s > 0) pts.push([ex, Y0 + 38, 120], [ex, Y0 + 52, 112], [ex, Y0 + 30, 107]);
+    else { const xc = k ? ex - 6 : ex - 39; pts.push([xr, Y0 + 40, 120], [xr, Y0 + 70, 119], [(xr + xc) / 2, Y0 + 86, 110], [xc, Y0 + 92, 85], [xc, Y0 + 92, 30], [xc, Y0 + 92, -30], [xc, Y0 + 92, -85], [(xc + ex) / 2, Y0 + 86, -104], [ex, Y0 + 66, -107], [ex, Y0 + 30, -107]); }
+    H(pts); }
 }
 { // ----- chamfer head: rail + blocks + servo + spindle detail -----
   linRail(300, 330, TT + 37, -35, gCh); linRail(300, 330, TT + 37, 35, gCh);
-  linBlock(250, TT + 56, -35, chSlide); linBlock(350, TT + 56, -35, chSlide); linBlock(250, TT + 56, 35, chSlide); linBlock(350, TT + 56, 35, chSlide);
-  servo(gCh, 540, TT + 70, 0, 'x', 100, 60); bolts(chSlide, [[240, Y0 + 55, -40], [360, Y0 + 55, -40], [240, Y0 + 55, 40], [360, Y0 + 55, 40]]);
+  linBlock(255, TT + 56, -35, chSlide); linBlock(350, TT + 56, -35, chSlide); linBlock(255, TT + 56, 35, chSlide); linBlock(350, TT + 56, 35, chSlide);
+  { box(13, 85, 120, M.alu, 538.5, TT + 42.5, 0, gCh); const sv = servo(gCh, 609, TT + 40, 0, 'x', 100, 60); sv.rotation.y = Math.PI; const scr = cyl(5, 380, M.steel, 'x', 342, TT + 40, 0, gCh, 16); const nut = box(40, 18, 30, M.brass, 300, TT + 40, 0, chSlide); nut.userData.with = [scr]; box(30, 6, 30, M.alu, 300, TT + 52, 0, chSlide); } bolts(chSlide, [[240, Y0 + 55, -40], [360, Y0 + 55, -40], [240, Y0 + 55, 40], [360, Y0 + 55, 40]]);
   for (let i = 0; i < 6; i++) { const a = i * TAU / 6; bolts(chSpin, [[-15, Math.cos(a) * 38, Math.sin(a) * 38, 'x', -1]], .6); }
   plate(70, 26, (c, w, h) => { c.fillStyle = '#e8ecf1'; c.fillRect(0, 0, w, h); c.fillStyle = '#c2551b'; c.font = `bold ${h * .55}px Arial`; c.fillText('R-FORM', w * .08, h * .72); }, 300, Y0 + 30, 56, chSlide, 0, 8);
-  tube([[420, Y0 + 40, -40], [460, Y0 + 120, -120], [520, TT + 140, -180], [560, TT + 60, -200]], 5, M.cable, gCh);
+  tube([[462, Y0 + 25, -20], [490, Y0 + 40, -70], [500, TT + 120, -100], [490, TT + 80, -112]], 5, M.cable, chSlide);
 }
 { // ----- laser: galvo detail, fume nozzle, warning sign, fiber cable -----
   plate(90, 30, (c, w, h) => { c.fillStyle = '#111'; c.fillRect(0, 0, w, h); c.fillStyle = '#ff7a2a'; c.font = `bold ${h * .5}px Arial`; c.fillText('FIBER  GALVO', w * .06, h * .65); }, LX, Y0 + 210, 61, gLaser, 0, 8);
@@ -668,7 +670,7 @@ const DET = {};
   const bt = canvasTex(512, 512, (x, w, h) => { x.fillStyle = '#9aa0a8'; x.fillRect(0, 0, w, h); x.translate(w / 2, h / 2); for (let r = 20; r < 250; r += 1.5) { const v = 130 + Math.random() * 80 | 0; x.strokeStyle = `rgba(${v},${v},${v},.5)`; x.beginPath(); x.arc(0, 0, r, 0, TAU); x.stroke(); } for (let i = 0; i < 6; i++) { x.rotate(TAU / 6); x.fillStyle = '#3a3f46'; x.fillRect(110, -3, 90, 6); } x.fillStyle = '#c2551b'; x.font = 'bold 34px Arial'; x.textAlign = 'center'; x.fillText('HSS-Co  Ø140', 0, -150); }, [1, 1], true);
   bladeDisk.material.map = bt; bladeDisk.material.color.set(0xffffff); bladeDisk.material.needsUpdate = true;
   servo(sawHead, SX, 265, 0, 'z', 100, 60, M.black);
-  for (const dz of [-40, 40]) cyl(10, 400, M.steel, 'y', SX, TT + 40 + 200, -235 + dz, gSaw, 16);
+  { const rods = [-40, 40].map(dz => cyl(10, 490, M.steel, 'y', SX, TT + 50 + 245, -235 + dz, gSaw, 16)); sawCar.forEach(b => b.userData.with = rods); }
   bolts(gSaw, [[SX - 20, TT + 50, -255], [SX + 20, TT + 50, -255], [SX - 20, TT + 50, -215], [SX + 20, TT + 50, -215]]);
   plate(60, 22, (c, w, h) => { c.fillStyle = '#111'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = `bold ${h * .55}px Arial`; c.fillText('CUT-OFF', w * .1, h * .7); }, SX + 19.5, 130, 0, sawHead, Math.PI / 2, 8);
 }
@@ -705,7 +707,7 @@ gEncl.traverse(o => { if (o.isMesh && o.geometry.type === 'ExtrudeGeometry') { o
 const edgeMat = new THREE.LineBasicMaterial({ color: 0x06080b, transparent: true, opacity: .5, depthWrite: false });
 // ---- performance: merge static meshes per part+material, merged edge lines ----
 const NOMERGE = new URLSearchParams(location.search).has('nomerge');
-const DYN = new Set(["infeed:3", "infeed:11", "infeed:19", "feeder:27", "feeder:28", "wheel:1", "clampA:2", "clampA:10", "clampB:2", "clampB:10", "support:2", "chamfer:4", "saw:1", "saw:5", "tower:3", "tower:4", "feeder:24", "wheel:6", "chamfer:1", "sort:16", "saw:6"]);
+const DYN = new Set(["infeed:3", "infeed:11", "infeed:19", "feeder:12", "feeder:13", "wheel:1", "clampA:2", "clampA:10", "clampB:2", "clampB:10", "support:2", "chamfer:4", "saw:1", "saw:9", "tower:3", "tower:4", "feeder:9", "wheel:6", "chamfer:1", "sort:16", "saw:10"]);
 for (const id of partOrder) { let i = 0; parts[id].g.traverse(o => { o.userData.pidx = id + ':' + (i++); }); }
 const PERF = { merged: 0, meshesBefore: 0 };
 { const ecache = new Map(); const edgeOf = g => { let e = ecache.get(g.uuid); if (!e) { e = new THREE.EdgesGeometry(g, 32); ecache.set(g.uuid, e); } return e; };
@@ -1003,8 +1005,8 @@ function visuals(dt, now) {
   if (expTarget !== null) { EXP += (expTarget - EXP) * Math.min(1, dt * 4); if (Math.abs(expTarget - EXP) < .002) { EXP = expTarget; expTarget = null; } $('sExp').value = EXP; $('vExp').textContent = Math.round(EXP * 100) + '%'; }
   for (const id of partOrder) { const p = parts[id]; p.g.position.copy(p.base).addScaledVector(p.dir, EXP); }
   // clamps
-  clampA.jaws.forEach(j => j.position.z = j.userData.s * (R + 15 + (1 - S.clampA) * 14 + EXP * 120) - 0 * j.userData.s);
-  clampB.jaws.forEach(j => j.position.z = j.userData.s * (R + 15 + (1 - S.clampB) * 14 + EXP * 120));
+  clampA.jaws.forEach(j => j.position.z = j.userData.s * (R + 15 + (1 - S.clampA) * Math.min(14, 26 - R) + EXP * 120) - 0 * j.userData.s);
+  clampB.jaws.forEach(j => j.position.z = j.userData.s * (R + 15 + (1 - S.clampB) * Math.min(14, 26 - R) + EXP * 120));
   clampA.jaws.forEach(j => j.position.z -= 0); 
   vRollers.forEach(v => v.position.y = Y0 - R * 1.25 - 6);
   supV.position.y = TT + 70; supV.position.x = 55; supBox.scale.y = Math.max(1, Y0 - R - 2 - (TT + 70));
@@ -1012,7 +1014,7 @@ function visuals(dt, now) {
   const tail = stock.present ? stock.front - stock.L : -1450; pusher.scale.set(1, R * .9 / 14, R * .9 / 14); tab.position.y = Y0 + R + 14; carriage.position.x = clamp(tail - 8, -1420, 40) + (stock.present && ph === 'load' ? -30 : 0);
   // chamfer slide
   const chWork = stock.present ? stock.front - (205 - 20) : -85; chSlide.position.x = lerp(70, Math.min(70, chWork + 2), S.chX); chSpin.rotation.x += (S.chX > .9 ? 40 : 0) * dt;
-  chSpin.scale.setScalar(clamp(R / 10 * .9 + .1, .6, 2.2)); chSpin.scale.x = 1;
+  chSpin.scale.setScalar(clamp(R / 10 * .9 + .1, .6, 1.25)); chSpin.scale.x = 1;
   // saw
   const sawUp = Y0 + R + 70 + 25, sawDn = Y0 - R - 8 + 70; sawArm.position.y = lerp(sawUp, sawDn, S.sawY); sawArm.position.x = 0;
   blade.rotation.x -= (ph === 'cut' ? (P.cut === 'saw' ? 60 : 25) : 2) * dt; bladeDisk.scale.x = P.cut === 'saw' ? 1 : 2.5;
@@ -1107,7 +1109,7 @@ syncUI(); loadPipe(); S.run = new URLSearchParams(location.search).has('paused')
 const qp = new URLSearchParams(location.search); if (qp.has('x')) { XRAY = true; $('bX').classList.add('on'); applyLook(); } if (qp.has('e')) { EXP = +qp.get('e'); }
 if (qp.has('st')) setTimeout(() => showStation(+qp.get('st')), 50);
 if (qp.has('cam')) { const c = qp.get('cam').split(',').map(Number); camera.position.set(c[0], c[1], c[2]); controls.target.set(c[3], c[4], c[5]); }
-requestAnimationFrame(frame); window.__R = renderer; window.__scene = scene;
+requestAnimationFrame(frame); window.__R = renderer; window.__cam = (p, t) => { camera.position.set(...p); controls.target.set(...t); controls.update(); wake(); }; window.__scene = scene;
 window.__ff = (sec) => { for (let i = 0; i < sec * 50; i++) { step(.02); visuals(.02, i * .02); } }; window.__S = S; window.__P = P;
 if (qp.has('hide')) for (const id of qp.get('hide').split(',')) if (parts[id]) parts[id].g.visible = false;
 if (qp.has('nolabels')) $('labels').style.visibility = 'hidden';
@@ -1130,3 +1132,33 @@ window.__probe = () => { const snap = () => { const m = new Map(); for (const id
   for (const id of partOrder) parts[id].g.traverse(o => o.updateMatrix()); const base = snap(); const dyn = new Set();
   const run = n => { for (let i = 0; i < n; i++) { step(.05); visuals(.05, i * .05); for (const id of partOrder) parts[id].g.traverse(o => o.updateMatrix()); const s = snap(); for (const [k, v] of s) if (base.get(k) !== v) dyn.add(k); } };
   P.dia = 12; run(500); P.dia = 40; run(500); P.cut = 'saw'; run(500); P.dia = 20; run(300); return [...dyn]; };
+// ---- debug: exact triangle-level interpenetration check (three-mesh-bvh), run with ?nomerge ----
+window.__triInit = async () => { if (window.__BVH) return; window.__BVH = await import('./vendor/bvh/index.module.js'); };
+window.__tri = (opt = {}) => { const { MeshBVH } = window.__BVH; const tol = opt.tol ?? .4, useAllow = opt.allow ?? true;
+  scene.updateMatrixWorld(true); const vis = o => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
+  const items = [];
+  for (const id of partOrder) parts[id].g.traverse(o => {
+    if (!o.isMesh || o.isInstancedMesh || !vis(o) || o.geometry.type === 'PlaneGeometry' || o.userData.edge) return;
+    let body = parts[id].g; for (let q = o; q && q !== parts[id].g; q = q.parent) if (DYN.has(q.userData.pidx)) { body = q; break; }
+    let al = []; for (let q = o; q; q = q.parent) if (q.userData.allow) al = al.concat(q.userData.allow);
+    const g = o.geometry; if (!g.boundsTree) { g.boundsTree = new MeshBVH(g); g.computeBoundingBox(); }
+    const bb = g.boundingBox, sz = bb.getSize(new THREE.Vector3()), c = bb.getCenter(new THREE.Vector3());
+    // shrink by tol (local) so face-to-face contact is not reported
+    const sh = new THREE.Matrix4().makeTranslation(c.x, c.y, c.z).multiply(new THREE.Matrix4().makeScale(...['x', 'y', 'z'].map(k => Math.max(.01, 1 - 2 * tol / Math.max(sz[k], 1e-3))))).multiply(new THREE.Matrix4().makeTranslation(-c.x, -c.y, -c.z));
+    let aw = []; for (let q = o; q; q = q.parent) if (q.userData.with) aw = aw.concat(q.userData.with);
+    items.push({ id, o, body, al, aw, wb: new THREE.Box3().setFromObject(o, true), M: o.matrixWorld.clone().multiply(sh) }); });
+  const out = []; const m = new THREE.Matrix4();
+  for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) { const A = items[i], B = items[j];
+    if (A.body === B.body) continue; if (A.id === B.id && !opt.same) { /* same part, different rigid bodies: still check */ }
+    if (useAllow && (A.al.includes(B.id) || B.al.includes(A.id))) continue;
+    if (useAllow && (A.aw.some(w => w === B.o || B.o.parent === w) || B.aw.some(w => w === A.o || A.o.parent === w))) continue;
+    if (!A.wb.intersectsBox(B.wb)) continue;
+    m.copy(A.M).invert().multiply(B.M);
+    let hit = A.o.geometry.boundsTree.intersectsGeometry(B.o.geometry, m);
+    if (!hit) { // containment: centre of the smaller inside the larger (closed shapes)
+      const sa = A.wb.getSize(new THREE.Vector3()).length(), sb = B.wb.getSize(new THREE.Vector3()).length(); const [S, L] = sa < sb ? [A, B] : [B, A];
+      if (L.o.geometry.type !== 'TubeGeometry' && !(L.o.geometry.type === 'CylinderGeometry' && L.o.geometry.parameters.openEnded) && L.wb.containsBox(S.wb)) {
+        const p = S.wb.getCenter(new THREE.Vector3()).applyMatrix4(L.o.matrixWorld.clone().invert()); const ray = new THREE.Ray(p, new THREE.Vector3(.577, .577, .577)); const hits = L.o.geometry.boundsTree.raycast(ray, THREE.DoubleSide); if (hits.length % 2 === 1) hit = 'inside'; } }
+    if (hit) { const f = b => [b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z].map(Math.round).join(','); out.push(`${A.id}/${A.o.userData.pidx}:${A.o.geometry.type}[${f(A.wb)}] x ${B.id}/${B.o.userData.pidx}:${B.o.geometry.type}[${f(B.wb)}]${hit === 'inside' ? ' INSIDE' : ''}`); } }
+  return out; };
+window.__triCycle = (sec = 14, dt = .2, opt) => { const all = new Map(); const add = l => l.forEach(s => { const k = s.replace(/\[[^\]]*\]/g, ''); if (!all.has(k)) all.set(k, s); }); add(__tri(opt)); for (let t = 0; t < sec; t += dt) { __ff(dt); add(__tri(opt)); } return [...all.values()]; };
