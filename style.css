@@ -90,3 +90,23 @@ body.mobile .lbl{font-size:10px;padding:1px 5px}
 body.mobile #pclose{display:block;position:absolute;left:10px;top:10px;flex:none;width:40px;min-height:36px;padding:0}
 
 body.mobile #toast{top:auto;bottom:86px;max-width:88vw;text-align:center;font-size:12.5px}
+
+.langb{flex:none;width:auto;padding:3px 9px;font-size:12px;font-weight:700;min-height:0!important;background:#1d5e86;border-color:#3fa6e6}
+#phead{position:relative}
+#bLang{position:absolute;top:10px;left:12px}
+#phead h1{padding-left:44px}
+#bLang2{display:none}
+body.mobile #bLang2{display:block;position:fixed;left:10px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:31;height:38px;border-radius:19px;padding:0 12px}
+body.mobile #bLang{left:56px}
+/* LTR (English) */
+html[dir=ltr] #hud{direction:ltr}
+html[dir=ltr] #hud b{text-align:left}
+html[dir=ltr] td.n{text-align:right}
+html[dir=ltr] .lbl .n{margin-left:0;margin-right:4px}
+html[dir=ltr] .card .tag{float:right}
+html[dir=ltr] #bLang{left:auto;right:12px}
+html[dir=ltr] #phead h1{padding-left:0;padding-right:44px}
+html[dir=ltr] body.mobile #pclose{left:auto;right:10px}
+html[dir=ltr] body.mobile #bLang{left:auto;right:56px}
+html[dir=ltr] body.mobile #phead h1{padding-right:96px}
+body.mobile #phead h1{padding-left:96px}
