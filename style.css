@@ -110,3 +110,4 @@ html[dir=ltr] body.mobile #pclose{left:auto;right:10px}
 html[dir=ltr] body.mobile #bLang{left:auto;right:56px}
 html[dir=ltr] body.mobile #phead h1{padding-right:96px}
 body.mobile #phead h1{padding-left:96px}
+body.mobile.menuopen #bLang2{display:none}
