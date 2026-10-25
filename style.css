@@ -88,3 +88,5 @@ body.mobile.menuopen #info{display:none}
 body.mobile .lbl{font-size:10px;padding:1px 5px}
 #pclose{display:none}
 body.mobile #pclose{display:block;position:absolute;left:10px;top:10px;flex:none;width:40px;min-height:36px;padding:0}
+
+body.mobile #toast{top:auto;bottom:86px;max-width:88vw;text-align:center;font-size:12.5px}
