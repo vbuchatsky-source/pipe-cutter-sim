@@ -282,8 +282,8 @@ renderer.shadowMap.type = THREE.PCFShadowMap; renderer.shadowMap.autoUpdate = fa
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.85;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x15181d);
-scene.fog = new THREE.Fog(0x1b1e23, 4500, 9000);
+scene.background = new THREE.Color(0x0B1016);
+scene.fog = new THREE.Fog(0x0B1016, 4500, 9000);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
 const camera = new THREE.PerspectiveCamera(34, 1, 20, 16000);
